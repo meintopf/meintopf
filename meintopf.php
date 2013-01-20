@@ -97,8 +97,7 @@ function meintopf_reader_fetch_feeds() {
 			foreach($feed->get_items() as $item) {
 				// Check if we have that post already
 				$args = array(
-					'meta_key'=>'meintopf_item_guid',
-					'meta_value'=> $item->get_id(),
+					'guid' => $item->get_id(),
 					'post_type' => 'meintopf_item'
 				);
 				$my_query = null;
@@ -109,17 +108,18 @@ function meintopf_reader_fetch_feeds() {
 						'post_type' =>'meintopf_item',
 						'post_title' => $item->get_title(),
 						'post_content' => $item->get_content(),
-						'post_date_gmt' => $item->get_gmdate('Y-m-d H:i:s')
+						'post_date_gmt' => $item->get_gmdate('Y-m-d H:i:s'),
+						'guid' => $item->get_id()
 					);
 					$id = wp_insert_post($post); // Insert the post
 					
-					// the post guid gets its own metadata field, for later existance checking.
-					update_post_meta($id, 'meintopf_item_guid', $item->get_id());
-					
 					// more metadata
+					$author = $item->get_feed()->get_title();
+					if ($author_obj = $item->get_author())
+						$author = $author_obj->get_name();
 					$meta = array(
 						'permalink' => $item->get_permalink(),
-						'guid' => $item->get_id(),
+						'author' => $author,
 						'feed_url' => $item->get_feed()->subscribe_url(),
 						'feed_title' => $item->get_feed()->get_title()
 					);
