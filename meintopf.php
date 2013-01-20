@@ -120,6 +120,8 @@ function meintopf_reader_fetch_feeds() {
 					$meta = array(
 						'permalink' => $item->get_permalink(),
 						'guid' => $item->get_id(),
+						'feed_url' => $item->get_feed()->subscribe_url(),
+						'feed_title' => $item->get_feed()->get_title()
 					);
 					update_post_meta($id, 'meintopf_item_metadata', $meta);
 				}
