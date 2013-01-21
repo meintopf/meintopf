@@ -40,6 +40,8 @@ function meintopf_activate() {
 // Init the plugin each time
 function meintopf_init() {
 	add_action('admin_menu', 'meintopf_admin_menu_entries');
+	add_action('admin_print_scripts', 'meintopf_reader_javascript');
+	add_action('wp_ajax_meintopf_repost', 'meintopf_ajax_repost');
 }
 
 // Add entries to the admin menu
@@ -83,9 +85,59 @@ function meintopf_reader() {
 	foreach( $myposts as $post ) {
 		echo "<div class=\"meintopf_reader_item\">";
 		if ($post->post_title)
-			echo "<h3>$post->post_title</h3>";
-		echo "<div class=\"meintopf_reader_content\">$post->post_content</div><a href=\"#\">Repost</a></div>";
+			echo "<h3>{$post->post_title}</h3>";
+		echo "<div class=\"meintopf_reader_content\">{$post->post_content}</div>";
+		if ($post->post_status == "draft") {
+			echo "<a href=\"#\" onclick=\"meintopf_repost({$post->ID})\">Repost</a>";
+		} else {
+			echo "Already Reposted";
+		}	
+		echo "</div>";
 	} 
+}
+
+function meintopf_reader_javascript() {
+	?>
+<script type="text/javascript" >
+function meintopf_repost(id) {
+	var data = {
+		action: 'meintopf_repost',
+		post_id: id
+	};
+	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+	jQuery.post(ajaxurl, data, function(response) {
+		alert('Got this from the server: ' + response);
+	});
+};
+</script>
+<?php
+}
+
+function meintopf_ajax_repost() {
+	$id = intval($_POST["post_id"]);
+	$post = get_post($id);
+	if ($post->post_type == "meintopf_item" && $post->post_status == "draft") {
+		$repost = array(
+			'post_type' =>'post',
+			'post_title' => $post->post_title,
+			'post_content' => $post->post_content,
+			'post_status' => "publish",
+			'comment_status' => "closed",
+			'ping_status' => "open",
+			'to_ping' => $post->guid
+		);
+		$success = wp_insert_post($repost);
+		if ($success <> 0) {
+			$post->post_status = "publish";
+			wp_update_post($post);
+			echo "success";
+		} else {
+			echo "failure while posting";
+		}
+	} else {
+		echo "failure while getting post";
+	}
+	die();
 }
 
 // Fetch updates
