@@ -50,14 +50,23 @@ function meintopf_admin_menu_entries() {
 
 // Show the admin menu page
 function meintopf_menu_page() {
+	echo "<div class=\"wrap\">
+	<div id=\"icon-edit-comments\" class=\"icon32\"></div><h2>mEintopf</h2>";
 	if (isset($_GET['action']) && $_GET['action'] == "fetch") {
 		meintopf_reader_fetch_feeds();
+		echo "<div id=\"message\" class=\"updated fade\"><p><strong>Feeds updated.</strong></p></div>";
 	} else {
 		if( isset($_POST['feedurl']) ) {
 			meintopf_add_feed($_POST['feedurl']);
+			echo "<div id=\"message\" class=\"updated fade\"><p><strong>Feeds updated.</strong></p></div>";
 		}
-		echo "<div><h2>Add Feed</h2><form action=\"\" method=\"post\"><label>Feed-URL:</label><input type=\"text\" name=\"feedurl\"><input type=\"submit\"></form></div><hr>";
+		echo "<h3>Add Feed</h3>
+		<form action=\"{$_SERVER['REQUEST_URI']}\" method=\"post\">
+			<ul>
+				<li><label for=\"feedurl\">Feed-URL</label><input type=\"text\" maxlength=\"45\" size=\"10\" name=\"feedurl\" id=\"feedurl\"><input type=\"submit\" class=\"button-primary\"></li>
+			</ul></form></div><hr>";
 		meintopf_reader();
+		echo "</div>";
 	}
 }
 
