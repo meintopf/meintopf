@@ -8,7 +8,8 @@ Author URI: http://severin.schols.de/
 License: MIT
 */
 
-//include_once('libs/simplepie_1.3.1.mini.php');
+// SimplePie Wordpress Edition
+include_once(ABSPATH . WPINC . '/class-simplepie.php');
 
 register_activation_hook( __FILE__, 'meintopf_activate' );
 add_action( 'init', 'meintopf_init' );
