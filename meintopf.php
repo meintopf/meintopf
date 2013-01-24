@@ -143,6 +143,10 @@ function meintopf_ajax_repost() {
 
 // Fetch updates
 function meintopf_reader_fetch_feeds() {
+	// Set feed wrapper's cache lifetime to 30 minutes instead of 12 hours.
+	$return_cache_duration = create_function( '$a', 'return 1800;' ) ;
+	add_filter( 'wp_feed_cache_transient_lifetime', $return_cache_duration);
+	
 	// get the list of feeds
 	$feeds = meintopf_get_feeds();
 	
@@ -187,6 +191,8 @@ function meintopf_reader_fetch_feeds() {
 			}
 		}
 	}
+	// Reset cache duration
+	remove_filter( 'wp_feed_cache_transient_lifetime', $return_cache_duration);
 }
 
 /* ******************
