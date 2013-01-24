@@ -9,7 +9,7 @@ License: MIT
 */
 
 // SimplePie Wordpress Edition
-include_once(ABSPATH . WPINC . '/class-simplepie.php');
+include_once(ABSPATH . WPINC . '/feed.php');
 
 register_activation_hook( __FILE__, 'meintopf_activate' );
 add_action( 'init', 'meintopf_init' );
@@ -148,14 +148,10 @@ function meintopf_reader_fetch_feeds() {
 	
 	// Make sure it's not empty.
 	if (count($feeds) <> 0) {
-		$feed = new SimplePie();
-		$feed->set_feed_url($feeds);
-		$feed->set_cache_duration (60);
-		$success = $feed->init();
+		$feed = fetch_feed($feeds);
 		
 		// We can haz feed items
-		if ($success) {
-			$feed->handle_content_type();
+		if (!is_wp_error( $feed )) {
 			foreach($feed->get_items() as $item) {
 				// Check if we have that post already
 				$args = array(
