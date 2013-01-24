@@ -11,6 +11,8 @@ License: MIT
 // SimplePie Wordpress Edition
 include_once(ABSPATH . WPINC . '/feed.php');
 
+include_once(dirname( __FILE__ ).'/Template.class.php');
+
 register_activation_hook( __FILE__, 'meintopf_activate' );
 add_action( 'init', 'meintopf_init' );
 
@@ -53,27 +55,33 @@ function meintopf_admin_menu_entries() {
 
 // Show the admin menu page
 function meintopf_menu_page() {
-	echo "<div class=\"wrap\">
-	<div id=\"icon-edit-comments\" class=\"icon32\"></div><h2>mEintopf</h2>";
+	
+	$message = "";
+	
 	if (isset($_GET['action']) && $_GET['action'] == "fetch") {
 		meintopf_reader_fetch_feeds();
-		echo "<div id=\"message\" class=\"updated fade\"><p><strong>Feeds updated.</strong></p></div>";
+		$message = "Feeds updated.";
+		$out = new Template('base.php', array(
+			"message" => $message,
+			"content" => ""
+		));
+		$out->render();
 	} else {
 		if( isset($_POST['feedurl']) ) {
 			meintopf_add_feed($_POST['feedurl']);
-			echo "<div id=\"message\" class=\"updated fade\"><p><strong>Feeds updated.</strong></p></div>";
+			$message = "Feed added.";
 		}
-		echo "<h3>Add Feed</h3>
-		<form action=\"{$_SERVER['REQUEST_URI']}\" method=\"post\">
-			<ul>
-				<li><label for=\"feedurl\">Feed-URL</label><input type=\"text\" maxlength=\"45\" size=\"10\" name=\"feedurl\" id=\"feedurl\"><input type=\"submit\" class=\"button-primary\"></li>
-			</ul></form></div><hr>";
-		meintopf_reader();
-		echo "</div>";
+		$posts = meintopf_reader_posts();
+		
+		$out = new Template('base.php', array(
+			"message" => $message,
+			"content" => new Template('reader.php', array("posts" => $posts))
+		));
+		$out->render();
 	}
 }
 
-function meintopf_reader() {
+function meintopf_reader_posts() {
 	$args = array(
     'posts_per_page'  => 20,
     'offset'          => 0,
@@ -82,19 +90,8 @@ function meintopf_reader() {
     'post_type'       => 'meintopf_item',
     'post_status'     => '%',
     'suppress_filters' => true );
-	$myposts = get_posts( $args );
-	foreach( $myposts as $post ) {
-		echo "<div class=\"meintopf_reader_item\">";
-		if ($post->post_title)
-			echo "<h3>{$post->post_title}</h3>";
-		echo "<div class=\"meintopf_reader_content\">{$post->post_content}</div>";
-		if ($post->post_status == "draft") {
-			echo "<a href=\"#\" onclick=\"meintopf_repost({$post->ID})\">Repost</a>";
-		} else {
-			echo "Already Reposted";
-		}	
-		echo "</div>";
-	} 
+	$posts = get_posts( $args );
+	return $posts;
 }
 
 function meintopf_reader_javascript() {
@@ -152,6 +149,7 @@ function meintopf_reader_fetch_feeds() {
 	
 	// Make sure it's not empty.
 	if (count($feeds) <> 0) {
+		// Fetch all feeds as one, using WP's wrapper.
 		$feed = fetch_feed($feeds);
 		
 		// We can haz feed items
