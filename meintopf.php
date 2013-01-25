@@ -11,15 +11,24 @@ License: MIT
 // SimplePie Wordpress Edition
 include_once(ABSPATH . WPINC . '/feed.php');
 
+// Simple templating system
 include_once(dirname( __FILE__ ).'/Template.class.php');
 
+// Plugin activation & deactivation hooks
 register_activation_hook( __FILE__, 'meintopf_activate' );
+register_deactivation_hook(__FILE__, 'meintopf_deactivate');
+
+// Custom action: plugin initialization, feed fetching using cron
 add_action( 'init', 'meintopf_init' );
+add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
 
 // Activate the plugin
 function meintopf_activate() {
+	// Generate options array
 	$options = array("feeds" => array());
 	add_option("meintopf_options",$options);
+	
+	// Create custom post type to store soup content
 	$args = array(
 		'public' => false,
 		'exclude_from_search' => false,
@@ -38,16 +47,29 @@ function meintopf_activate() {
 		'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'custom-fields'  )
 	);
 	register_post_type( 'meintopf_item', $args );
+	
+	// schedule feed fetcher
+	wp_schedule_event( time(), 'hourly', 'meintopf_fetch_feeds');
+}
+
+// deactivate plugin
+function meintopf_deactivate() {
+	// Remove feed fetcher from schedule
+	wp_clear_scheduled_hook('meintopf_fetch_feeds');
 }
 
 // Init the plugin each time
 function meintopf_init() {
+	/* Custom actions */
+	// Create admin menu entry
 	add_action('admin_menu', 'meintopf_admin_menu_entries');
+	// add javascript to header
 	add_action('admin_print_scripts', 'meintopf_reader_javascript');
+	// Ajax hooks
 	add_action('wp_ajax_meintopf_repost', 'meintopf_ajax_repost');
 }
 
-// Add entries to the admin menu
+// Action endpoint: add entries to the admin menu
 function meintopf_admin_menu_entries() {
 	add_menu_page('mEintopf', 'mEintopf', 'publish_posts', 'meintopf', 'meintopf_menu_page',"",'1'); 
 
