@@ -184,7 +184,8 @@ function meintopf_reader_fetch_feeds() {
 			foreach($feed->get_items() as $item) {
 				// Check if we have that post already
 				$args = array(
-					'guid' => $item->get_id(),
+					'meta_key' => 'meintopf_source',
+					'meta_value' => $item->get_permalink(),
 					'post_type' => 'meintopf_item'
 				);
 				$my_query = null;
@@ -199,6 +200,8 @@ function meintopf_reader_fetch_feeds() {
 						'guid' => $item->get_id()
 					);
 					$id = wp_insert_post($post); // Insert the post
+					
+					update_post_meta($id, 'meintopf_source', $item->get_permalink());
 					
 					// more metadata
 					$author = $item->get_feed()->get_title();
