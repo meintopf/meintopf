@@ -21,7 +21,7 @@
 		<div class="meintopf_reader_content"><?= $post->post_content; ?></div>
 		
 		<?php if ($post->post_status == "draft") { ?>
-			<a href="#" onclick="meintopf_repost(<?php $post->ID;?>)">Repost</a>";
+			<a href="#" onclick="meintopf_repost(<?= $post->ID;?>)">Repost</a>
 		<?php } else { ?>
 			Already Reposted
 		<?php } ?>
