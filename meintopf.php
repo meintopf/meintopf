@@ -29,24 +29,26 @@ function meintopf_activate() {
 	add_option("meintopf_options",$options);
 	
 	// Create custom post type to store soup content
-	$args = array(
-		'public' => false,
-		'exclude_from_search' => false,
-		'publicly_queryable' => false,
-		'show_ui' => false, 
-		'show_in_menu' => false, 
-		'query_var' => true,
-		'rewrite' => array( 'slug' => 'book' ),
-		'capability_type' => 'post',
-		'has_archive' => false, 
-		'hierarchical' => false,
-		'menu_position' => null,
-		'map_meta_cap' => false,
-		'query_var' => false,
-		'can_export' => false,
-		'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'custom-fields'  )
-	);
-	register_post_type( 'meintopf_item', $args );
+	if (!post_type_exists('meintopf_item')) {
+		$args = array(
+			'public' => false,
+			'exclude_from_search' => false,
+			'publicly_queryable' => false,
+			'show_ui' => false, 
+			'show_in_menu' => false, 
+			'query_var' => true,
+			'rewrite' => array( 'slug' => 'book' ),
+			'capability_type' => 'post',
+			'has_archive' => false, 
+			'hierarchical' => false,
+			'menu_position' => null,
+			'map_meta_cap' => false,
+			'query_var' => false,
+			'can_export' => false,
+			'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'custom-fields'  )
+		);
+		register_post_type( 'meintopf_item', $args );
+	}
 	
 	// schedule feed fetcher
 	wp_schedule_event( time(), 'hourly', 'meintopf_fetch_feeds');
@@ -81,8 +83,11 @@ function meintopf_menu_page() {
 	$message = "";
 	
 	if (isset($_GET['action']) && $_GET['action'] == "fetch") {
-		meintopf_reader_fetch_feeds();
-		$message = "Feeds updated.";
+		if (meintopf_reader_fetch_feeds()) {
+			$message = "Feeds updated.";
+		} else {
+			$message = "Error getting feeds";
+		}
 		$out = new Template('base.php', array(
 			"message" => $message,
 			"content" => ""
@@ -170,7 +175,7 @@ function meintopf_reader_fetch_feeds() {
 	$feeds = meintopf_get_feeds();
 	
 	// Make sure it's not empty.
-	if (count($feeds) <> 0) {
+	if (count($feeds) > 0) {
 		// Fetch all feeds as one, using WP's wrapper.
 		$feed = fetch_feed($feeds);
 		
@@ -209,10 +214,15 @@ function meintopf_reader_fetch_feeds() {
 				}
 				wp_reset_query();
 			}
+		} else {
+			return false;
 		}
+	} else {
+		return false;
 	}
 	// Reset cache duration
 	remove_filter( 'wp_feed_cache_transient_lifetime', $return_cache_duration);
+	return true;
 }
 
 /* ******************
