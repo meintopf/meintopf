@@ -62,19 +62,27 @@ function meintopf_deactivate() {
 
 // Init the plugin each time
 function meintopf_init() {
+	// Register JS
+	wp_register_script( 'meintopf_js', plugins_url('/script.js', __FILE__) );
+	wp_register_script( 'handlebars', plugins_url('/handlebars.js', __FILE__) );
 	/* Custom actions */
 	// Create admin menu entry
 	add_action('admin_menu', 'meintopf_admin_menu_entries');
-	// add javascript to header
-	add_action('admin_print_scripts', 'meintopf_reader_javascript');
 	// Ajax hooks
 	add_action('wp_ajax_meintopf_repost', 'meintopf_ajax_repost');
+	add_action('wp_ajax_meintopf_next_posts', 'meintopf_ajax_next_posts');
 }
 
 // Action endpoint: add entries to the admin menu
 function meintopf_admin_menu_entries() {
-	add_menu_page('mEintopf', 'mEintopf', 'publish_posts', 'meintopf', 'meintopf_menu_page',"",'1'); 
+	$page = add_menu_page('mEintopf', 'mEintopf', 'publish_posts', 'meintopf', 'meintopf_menu_page',"",'1'); 
+	/* Using registered $page handle to hook script load */
+	add_action('admin_print_scripts-' . $page, 'meintopf_admin_scripts');
+}
 
+function meintopf_admin_scripts() {
+	wp_enqueue_script( 'handlebars' );
+	wp_enqueue_script( 'meintopf_js' );
 }
 
 // Show the admin menu page
@@ -98,7 +106,7 @@ function meintopf_menu_page() {
 			meintopf_add_feed($_POST['feedurl']);
 			$message = "Feed added.";
 		}
-		$posts = meintopf_reader_posts();
+		$posts = meintopf_reader_get_posts(0);
 		
 		$out = new Template('base.php', array(
 			"message" => $message,
@@ -108,11 +116,11 @@ function meintopf_menu_page() {
 	}
 }
 
-function meintopf_reader_posts() {
+function meintopf_reader_get_posts($page_no, $posts_per_page = 20) {
 	$args = array(
-    'posts_per_page'  => 20,
-    'offset'          => 0,
-    'orderby'         => 'post_date',
+    'posts_per_page'  => $posts_per_page,
+    'paged'           => $page_no,
+    'orderby'         => 'post_date ID',
     'order'           => 'DESC',
     'post_type'       => 'meintopf_item',
     'post_status'     => '%',
@@ -121,27 +129,17 @@ function meintopf_reader_posts() {
 	return $posts;
 }
 
-function meintopf_reader_javascript() {
-	?>
-<script type="text/javascript" >
-function meintopf_repost(id) {
-	var data = {
-		action: 'meintopf_repost',
-		post_id: id
-	};
-	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
-	jQuery.post(ajaxurl, data, function(response) {
-		alert('Got this from the server: ' + response);
-	});
-};
-</script>
-<?php
+function meintopf_ajax_next_posts() {
+	$page_no = intval($_POST["page_no"]);
+	$posts = meintopf_reader_get_posts($page_no);
+	wp_send_json($posts);
 }
 
 function meintopf_ajax_repost() {
 	$id = intval($_POST["post_id"]);
 	$post = get_post($id);
 	if ($post->post_type == "meintopf_item" && $post->post_status == "draft") {
+		$meta = get_post_meta($post->ID, 'meintopf_item_metadata', true);
 		$repost = array(
 			'post_type' =>'post',
 			'post_title' => $post->post_title,
@@ -149,13 +147,13 @@ function meintopf_ajax_repost() {
 			'post_status' => "publish",
 			'comment_status' => "closed",
 			'ping_status' => "open",
-			'to_ping' => $post->guid
+			'to_ping' => $meta["permalink"]
 		);
 		$success = wp_insert_post($repost);
 		if ($success <> 0) {
 			$post->post_status = "publish";
 			wp_update_post($post);
-			echo "success";
+			wp_send_json($post);
 		} else {
 			echo "failure while posting";
 		}

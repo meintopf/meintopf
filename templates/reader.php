@@ -12,18 +12,21 @@
 
 <hr>
 
-<?php foreach( $this->posts as $post ) { ?>
-	<div class="meintopf_reader_item">
-		<?php if ($post->post_title) { ?>
-			<h3><?= $post->post_title;?></h3>
-		<?php } ?>
-		
-		<div class="meintopf_reader_content"><?= $post->post_content; ?></div>
-		
-		<?php if ($post->post_status == "draft") { ?>
-			<a href="#" onclick="meintopf_repost(<?= $post->ID;?>)">Repost</a>
-		<?php } else { ?>
-			Already Reposted
-		<?php } ?>
-	</div>
-<?php } ?>
+<div id="meintopf_feed">
+	<script id="meintopf_reader_item_template" type="text/x-handlebars-template">
+		<div class="meintopf_reader_item" id="item_{{id}}">
+			{{#if title}}
+				<h3>{{title}}</h3>
+			{{/if}}
+			
+			<div class="meintopf_reader_content">{{{content}}}</div>
+			{{#unless reposted }}
+				<a href="#" onclick="meintopf_repost({{id}})">Repost</a>
+			{{/unless}}
+			{{#if reposted}}
+				Already reposted.
+			{{/if}}
+		</div>
+	</script>
+</div>
+
