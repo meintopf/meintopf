@@ -239,5 +239,7 @@ function meintopf_add_feed($feed) {
 	$options = get_option("meintopf_options");
 	$options['feeds'][] = $feed;
 	update_option('meintopf_options',$options);
+	wp_schedule_single_event(time(), 'meintopf_fetch_feeds');
+	spawn_cron(time());
 }
 ?>
