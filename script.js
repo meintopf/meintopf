@@ -13,7 +13,6 @@ function meintopf_repost(id) {
 };
 
 function meintopf_next_posts(page_no) {
-	console.log(page_no);
 	var data = {
 		action: 'meintopf_next_posts',
 		page_no: page_no
