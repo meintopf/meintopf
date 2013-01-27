@@ -28,5 +28,6 @@
 			{{/if}}
 		</div>
 	</script>
+	<div id="loader"><a id="load_next" href="#">Load next posts</a></div>
 </div>
 

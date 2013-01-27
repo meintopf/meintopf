@@ -13,6 +13,7 @@ function meintopf_repost(id) {
 };
 
 function meintopf_next_posts(page_no) {
+	console.log(page_no);
 	var data = {
 		action: 'meintopf_next_posts',
 		page_no: page_no
@@ -21,8 +22,11 @@ function meintopf_next_posts(page_no) {
 	jQuery.post(ajaxurl, data, function(posts) {
 		jQuery.each(posts, function(index, value) {
 			var html = meintopf_render_item(value);
-			jQuery("#meintopf_feed").append(html);
+			jQuery("#meintopf_feed #loader").before(html);
 		});
+		jQuery("#meintopf_feed #loader #load_next").off().click(function() {
+				meintopf_next_posts(page_no + 1);
+			});
 	});
 };
 
@@ -38,5 +42,5 @@ function meintopf_render_item(post) {
 jQuery(window).ready(function() {
 	var source   = jQuery("#meintopf_reader_item_template").html();
 	meintopf_item_template = Handlebars.compile(source);
-	meintopf_next_posts(0);
+	meintopf_next_posts(1);
 });
