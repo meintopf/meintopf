@@ -182,8 +182,8 @@ function meintopf_reader_fetch_feeds() {
 			foreach($feed->get_items() as $item) {
 				// Check if we have that post already
 				$args = array(
-					'meta_key' => 'meintopf_source',
-					'meta_value' => $item->get_permalink(),
+					'meta_key' => 'meintopf_guid',
+					'meta_value' => $item->get_id(false),
 					'post_type' => 'meintopf_item'
 				);
 				$my_query = null;
@@ -194,12 +194,13 @@ function meintopf_reader_fetch_feeds() {
 						'post_type' =>'meintopf_item',
 						'post_title' => $item->get_title(),
 						'post_content' => $item->get_content(),
+						'post_date' => $item->get_date('Y-m-d H:i:s'),
 						'post_date_gmt' => $item->get_gmdate('Y-m-d H:i:s'),
 						'guid' => $item->get_id()
 					);
 					$id = wp_insert_post($post); // Insert the post
 					
-					update_post_meta($id, 'meintopf_source', $item->get_permalink());
+					update_post_meta($id, 'meintopf_guid', $item->get_id(false));
 					
 					// more metadata
 					$author = $item->get_feed()->get_title();
