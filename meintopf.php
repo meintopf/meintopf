@@ -22,6 +22,9 @@ register_deactivation_hook(__FILE__, 'meintopf_deactivate');
 add_action( 'init', 'meintopf_init' );
 add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
 
+// Filters to do things to other things
+add_filter( 'the_content', 'meintopf_filter_content_append' );
+
 // Activate the plugin
 function meintopf_activate() {
 	// Version check
@@ -156,6 +159,7 @@ function meintopf_ajax_repost() {
 		);
 		$success = wp_insert_post($repost);
 		if ($success <> 0) {
+			update_post_meta($success, 'meintopf_item_metadata', $meta);
 			$post->post_status = "publish";
 			wp_update_post($post);
 			wp_send_json($post);
@@ -230,6 +234,15 @@ function meintopf_reader_fetch_feeds() {
 	// Reset cache duration
 	remove_filter( 'wp_feed_cache_transient_lifetime', $return_cache_duration);
 	return true;
+}
+
+function meintopf_filter_content_append( $content ) {
+	$meta = get_post_meta(get_the_ID() , 'meintopf_item_metadata', true);
+	if ($meta != "") {
+		$source_html = "<div class=\"meintopf_sources\">Reposted from <a href=\"{$meta["permalink"]}\">{$meta["feed_title"]}</a></div>";
+		$content = $content . $source_html;
+	}
+	return $content;
 }
 
 /* ******************
