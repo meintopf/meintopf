@@ -191,7 +191,7 @@ function meintopf_reader_fetch_feeds() {
 					// Create the post itself
 					$post = array(
 						'post_type' =>'meintopf_item',
-						'post_title' => $item->get_title(),
+						'post_title' => htmlspecialchars_decode($item->get_title()),
 						'post_content' => $item->get_content(),
 						'post_date' => $item->get_date('Y-m-d H:i:s'),
 						'post_date_gmt' => $item->get_gmdate('Y-m-d H:i:s'),
