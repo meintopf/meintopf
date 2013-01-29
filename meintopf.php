@@ -24,6 +24,12 @@ add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
 
 // Activate the plugin
 function meintopf_activate() {
+	// Version check
+	global $wp_version;
+	if (version_compare($wp_version,"3.5","<"))	{
+		exit("mEintopf requires WordPress 3.5 or newer.");
+	}
+	
 	// Generate options array
 	$options = array("feeds" => array());
 	add_option("meintopf_options",$options);
