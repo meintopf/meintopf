@@ -5,6 +5,7 @@ function meintopf_repost(id) {
 		action: 'meintopf_repost',
 		post_id: id
 	};
+	
 	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
 	jQuery.post(ajaxurl, data, function(response) {
 		var html = meintopf_render_item(response);
@@ -24,7 +25,9 @@ function meintopf_next_posts(page_no) {
 			jQuery("#meintopf_feed #loader").before(html);
 		});
 		jQuery("#meintopf_feed #loader #load_next").off().click(function(e) {
+				// Prevent scrolling to the top
 				e.preventDefault();
+				
 				meintopf_next_posts(page_no + 1);
 			});
 	});

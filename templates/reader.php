@@ -21,7 +21,7 @@
 			
 			<div class="meintopf_reader_content">{{{content}}}</div>
 			{{#unless reposted }}
-				<a href="#" onclick="meintopf_repost({{id}})">Repost</a>
+				<a href="#" onclick="meintopf_repost({{id}});return false;">Repost</a>
 			{{/unless}}
 			{{#if reposted}}
 				Already reposted.
