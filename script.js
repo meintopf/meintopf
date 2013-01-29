@@ -23,7 +23,8 @@ function meintopf_next_posts(page_no) {
 			var html = meintopf_render_item(value);
 			jQuery("#meintopf_feed #loader").before(html);
 		});
-		jQuery("#meintopf_feed #loader #load_next").off().click(function() {
+		jQuery("#meintopf_feed #loader #load_next").off().click(function(e) {
+				e.preventDefault();
 				meintopf_next_posts(page_no + 1);
 			});
 	});
