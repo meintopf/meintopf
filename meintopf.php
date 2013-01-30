@@ -193,7 +193,8 @@ function meintopf_reader_fetch_feeds() {
 				$args = array(
 					'meta_key' => 'meintopf_guid',
 					'meta_value' => $item->get_id(false),
-					'post_type' => 'meintopf_item'
+					'post_type' => 'meintopf_item',
+					'post_status'     => '%'
 				);
 				$my_query = null;
 				$my_query = new WP_Query($args);
