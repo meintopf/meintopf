@@ -131,7 +131,7 @@ function meintopf_reader_get_posts($page_no, $posts_per_page = 20) {
     'paged'           => $page_no,
     'orderby'         => 'post_date_gmt',
     'post_type'       => 'meintopf_item',
-    'post_status'     => '%',
+    'post_status'     => 'any',
     'suppress_filters' => true );
 	$posts = get_posts( $args );
 	return $posts;
@@ -194,7 +194,7 @@ function meintopf_reader_fetch_feeds() {
 					'meta_key' => 'meintopf_guid',
 					'meta_value' => $item->get_id(false),
 					'post_type' => 'meintopf_item',
-					'post_status'     => '%'
+					'post_status'     => 'any'
 				);
 				$my_query = null;
 				$my_query = new WP_Query($args);
