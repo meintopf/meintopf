@@ -21,6 +21,7 @@ register_deactivation_hook(__FILE__, 'meintopf_deactivate');
 // Custom action: plugin initialization, feed fetching using cron
 add_action( 'init', 'meintopf_init' );
 add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
+add_action( 'wp_enqueue_scripts', 'meintopf_scripts' );
 
 // Filters to do things to other things
 add_filter( 'the_content', 'meintopf_filter_content_append' );
@@ -72,8 +73,12 @@ function meintopf_deactivate() {
 // Init the plugin each time
 function meintopf_init() {
 	// Register JS
-	wp_register_script( 'meintopf_js', plugins_url('/script.js', __FILE__) );
-	wp_register_script( 'handlebars', plugins_url('/handlebars.js', __FILE__) );
+	wp_register_script( 'meintopf_admin_js', plugins_url('script.js', __FILE__) );
+	wp_register_script( 'handlebars', plugins_url('handlebars.js', __FILE__) );
+	
+	// Register CSS
+	wp_register_style( 'meintopf_css', plugins_url('style.css', __FILE__) );
+	
 	/* Custom actions */
 	// Create admin menu entry
 	add_action('admin_menu', 'meintopf_admin_menu_entries');
@@ -89,9 +94,13 @@ function meintopf_admin_menu_entries() {
 	add_action('admin_print_scripts-' . $page, 'meintopf_admin_scripts');
 }
 
+function meintopf_scripts() {
+	wp_enqueue_style( 'meintopf_css' );
+}
+
 function meintopf_admin_scripts() {
 	wp_enqueue_script( 'handlebars' );
-	wp_enqueue_script( 'meintopf_js' );
+	wp_enqueue_script( 'meintopf_admin_js' );
 }
 
 // Show the admin menu page
