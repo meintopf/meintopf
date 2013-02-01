@@ -187,6 +187,9 @@ function meintopf_reader_fetch_feeds() {
 	$return_cache_duration = create_function( '$a', 'return 1800;' ) ;
 	add_filter( 'wp_feed_cache_transient_lifetime', $return_cache_duration);
 	
+	// Allow additional tags in KSES via filter.
+	add_filter( 'wp_kses_allowed_html', 'meintopf_adjust_kses_tags');
+	
 	// get the list of feeds
 	$feeds = meintopf_get_feeds();
 	
@@ -243,7 +246,15 @@ function meintopf_reader_fetch_feeds() {
 	}
 	// Reset cache duration
 	remove_filter( 'wp_feed_cache_transient_lifetime', $return_cache_duration);
+	// remove extra kses tags
+	remove_filter( 'wp_kses_allowed_html', 'meintopf_adjust_kses_tags');
 	return true;
+}
+
+// Allow extra tags in pulled feeds. For now: iframe (for youtube embedding)
+function meintopf_adjust_kses_tags($allowedtags) {
+	$allowedtags['iframe'] = array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true );
+	return $allowedtags;
 }
 
 function meintopf_filter_content_append( $content ) {
