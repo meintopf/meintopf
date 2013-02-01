@@ -4,7 +4,7 @@
 	<ul>
 		<li>
 			<label for="feedurl">Feed-URL</label>
-			<input type="text" maxlength="45" size="10" name="feedurl" id="feedurl">
+			<input type="text" maxlength="255" size="50" name="feedurl" id="feedurl">
 			<input type="submit" class="button-primary">
 		</li>
 	</ul>
