@@ -121,8 +121,12 @@ function meintopf_menu_page() {
 		$out->render();
 	} else {
 		if( isset($_POST['feedurl']) ) {
-			meintopf_add_feed($_POST['feedurl']);
-			$message = "Feed added.";
+			$success = meintopf_add_feed($_POST['feedurl']);
+			if ($success) {
+				$message = "Feed added.";
+			} else {
+				$message = "Could not add feed.";
+			}
 		}
 		$posts = meintopf_reader_get_posts(0);
 		
@@ -275,11 +279,17 @@ function meintopf_get_feeds() {
 	return $options["feeds"];
 }
 
-function meintopf_add_feed($feed) {
-	$options = get_option("meintopf_options");
-	$options['feeds'][] = $feed;
-	update_option('meintopf_options',$options);
-	wp_schedule_single_event(time(), 'meintopf_fetch_feeds');
-	spawn_cron(time());
+function meintopf_add_feed($feed_url) {
+	$feed = fetch_feed($feed_url);
+	if (is_wp_error( $feed )) {
+		return false;
+	} else {
+		$options = get_option("meintopf_options");
+		$options['feeds'][] = $feed->subscribe_url();
+		update_option('meintopf_options',$options);
+		wp_schedule_single_event(time(), 'meintopf_fetch_feeds');
+		spawn_cron(time());
+		return true;
+	}
 }
 ?>
