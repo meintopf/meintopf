@@ -15,11 +15,13 @@ class Template {
 		$this->file = dirname( __FILE__ )."/templates/".$file;
 		$this->args = $args;
 	}
-
+	
+	// render template to stdout
 	public function render() {
 		include $this->file;
 	}
 	
+	// render template to a string
 	public function renderToString() {
 		ob_start();
 		$this->render();

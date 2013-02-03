@@ -94,10 +94,12 @@ function meintopf_admin_menu_entries() {
 	add_action('admin_print_scripts-' . $page, 'meintopf_admin_scripts');
 }
 
+// Scripts to add to every page
 function meintopf_scripts() {
 	wp_enqueue_style( 'meintopf_css' );
 }
 
+// Scripts to add to admin page
 function meintopf_admin_scripts() {
 	wp_enqueue_script( 'handlebars' );
 	wp_enqueue_script( 'meintopf_admin_js' );
@@ -109,6 +111,7 @@ function meintopf_menu_page() {
 	$message = "";
 	
 	if (isset($_GET['action']) && $_GET['action'] == "fetch") {
+		// Manual feed fetching
 		if (meintopf_reader_fetch_feeds()) {
 			$message = "Feeds updated.";
 		} else {
@@ -121,6 +124,7 @@ function meintopf_menu_page() {
 		$out->render();
 	} else {
 		if( isset($_POST['feedurl']) ) {
+			//trying to add a new feed.
 			$success = meintopf_add_feed($_POST['feedurl']);
 			if ($success) {
 				$message = "Feed added.";
@@ -128,16 +132,17 @@ function meintopf_menu_page() {
 				$message = "Could not add feed.";
 			}
 		}
-		$posts = meintopf_reader_get_posts(0);
 		
+		// create and render template
 		$out = new Template('base.php', array(
 			"message" => $message,
-			"content" => new Template('reader.php', array("posts" => $posts))
+			"content" => new Template('reader.php', array())
 		));
 		$out->render();
 	}
 }
 
+// Get all items
 function meintopf_reader_get_posts($page_no, $posts_per_page = 20) {
 	$args = array(
     'posts_per_page'  => $posts_per_page,
@@ -150,17 +155,27 @@ function meintopf_reader_get_posts($page_no, $posts_per_page = 20) {
 	return $posts;
 }
 
+// AJAX function to grab new items. Called with attribute "page_no".
 function meintopf_ajax_next_posts() {
+	// Get attribute
 	$page_no = intval($_POST["page_no"]);
+	// Get items
 	$posts = meintopf_reader_get_posts($page_no);
+	// Send items back as json
 	wp_send_json($posts);
 }
 
+// AJAX function for reposting a single item. Called with attribute "post_id"
 function meintopf_ajax_repost() {
+	// Get attribute
 	$id = intval($_POST["post_id"]);
+	// Get the post to be reposted
 	$post = get_post($id);
+	// Check if it is a valid post, and has not been reposted before.
 	if ($post->post_type == "meintopf_item" && $post->post_status == "draft") {
+		// Grab post metadata
 		$meta = get_post_meta($post->ID, 'meintopf_item_metadata', true);
+		// create the real post
 		$repost = array(
 			'post_type' =>'post',
 			'post_title' => $post->post_title,
@@ -170,11 +185,16 @@ function meintopf_ajax_repost() {
 			'ping_status' => "open",
 			'to_ping' => $meta["permalink"]
 		);
+		// insert it
 		$success = wp_insert_post($repost);
 		if ($success <> 0) {
+			// Append metadata for repost
 			update_post_meta($success, 'meintopf_item_metadata', $meta);
+			
+			// Set meintopf item status to publish, as in "has been reposted"
 			$post->post_status = "publish";
 			wp_update_post($post);
+			// Send meintopf item back as json.
 			wp_send_json($post);
 		} else {
 			echo "failure while posting";
@@ -255,19 +275,25 @@ function meintopf_reader_fetch_feeds() {
 	return true;
 }
 
-// Allow extra tags in pulled feeds. For now: iframe (for youtube embedding)
+// FILTER: Allow extra tags in pulled feeds. For now: iframe (for youtube embedding)
 function meintopf_adjust_kses_tags($allowedtags) {
 	$allowedtags['iframe'] = array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true );
 	return $allowedtags;
 }
 
+// FILTER: Append "Reposted from" to any post with the given set of metadata.
+// Exact content of the append is pulled from template
 function meintopf_filter_content_append( $content ) {
+	// get the metadata
 	$meta = get_post_meta(get_the_ID() , 'meintopf_item_metadata', true);
+	// Got something?
 	if ($meta != "") {
+		// Create instance of template with given values.
 		$out = new Template('repost.php', array(
 			"permalink" => $meta["permalink"],
 			"title" => $meta["feed_title"]
 		));
+		// Render the template out to a string and append it to the content.
 		$content = $content . $out->rendertoString();;
 	}
 	return $content;
@@ -276,22 +302,30 @@ function meintopf_filter_content_append( $content ) {
 /* ******************
  *	Manage Feeds
  * ******************/
-
+// Get list of feeds we are subscribed to
 function meintopf_get_feeds() {
 	$options = get_option("meintopf_options");
 	return $options["feeds"];
 }
 
+// Add a feed to the list
 function meintopf_add_feed($feed_url) {
+	// Initialize a simplepie object with the given url
 	$feed = fetch_feed($feed_url);
+	// Not a valid feed?
 	if (is_wp_error( $feed )) {
+		// Failure.
 		return false;
-	} else {
+	} else { // Feed is valid
 		$options = get_option("meintopf_options");
-		$options['feeds'][] = $feed->subscribe_url();
+		// Add subscribe url to feed list (instead of given url to avoid autodiscovery)
+		$options['feeds'][] = $feed->subscribe_url(); 
 		update_option('meintopf_options',$options);
+		// Schedule feed fetching.
 		wp_schedule_single_event(time(), 'meintopf_fetch_feeds');
+		// spawn crown now.
 		spawn_cron(time());
+		// Success.
 		return true;
 	}
 }
