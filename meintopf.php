@@ -264,8 +264,11 @@ function meintopf_adjust_kses_tags($allowedtags) {
 function meintopf_filter_content_append( $content ) {
 	$meta = get_post_meta(get_the_ID() , 'meintopf_item_metadata', true);
 	if ($meta != "") {
-		$source_html = "<div class=\"meintopf_sources\">Reposted from <a href=\"{$meta["permalink"]}\">{$meta["feed_title"]}</a></div>";
-		$content = $content . $source_html;
+		$out = new Template('repost.php', array(
+			"permalink" => $meta["permalink"],
+			"title" => $meta["feed_title"]
+		));
+		$content = $content . $out->rendertoString();;
 	}
 	return $content;
 }
