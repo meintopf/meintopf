@@ -19,5 +19,11 @@ class Template {
 	public function render() {
 		include $this->file;
 	}
+	
+	public function renderToString() {
+		ob_start();
+		$this->render();
+		return ob_get_clean();
+	}
 }
 ?>
