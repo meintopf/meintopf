@@ -89,7 +89,9 @@ function meintopf_init() {
 
 // Action endpoint: add entries to the admin menu
 function meintopf_admin_menu_entries() {
-	$page = add_menu_page('mEintopf', 'mEintopf', 'publish_posts', 'meintopf', 'meintopf_menu_page',"",'1'); 
+	$page = add_menu_page('mEintopf', 'mEintopf', 'publish_posts', 'meintopf', 'meintopf_page_reader',"",'1');
+	add_submenu_page( "meintopf", "mEintopf - Stream", "Stream", "publish_posts", "meintopf", "meintopf_page_reader" );
+	add_submenu_page( "meintopf", "mEintopf - Feeds", "Feeds", "publish_posts", "feeds", "meintopf_page_feeds" );
 	/* Using registered $page handle to hook script load */
 	add_action('admin_print_scripts-' . $page, 'meintopf_admin_scripts');
 }
@@ -106,7 +108,7 @@ function meintopf_admin_scripts() {
 }
 
 // Show the admin menu page
-function meintopf_menu_page() {
+function meintopf_page_reader() {
 	
 	$message = "";
 	
@@ -135,11 +137,40 @@ function meintopf_menu_page() {
 		
 		// create and render template
 		$out = new Template('base.php', array(
+			"title" => "Your Stream",
 			"message" => $message,
 			"content" => new Template('reader.php', array())
 		));
 		$out->render();
 	}
+}
+
+
+// Show the feed management page
+function meintopf_page_feeds() {
+	
+	$message = "";
+	
+	
+	if( isset($_POST['feedurl']) ) {
+		//trying to add a new feed.
+		$success = meintopf_add_feed($_POST['feedurl']);
+		if ($success) {
+			$message = "Feed added.";
+		} else {
+			$message = "Could not add feed.";
+		}
+	}
+		
+	// create and render template
+	$out = new Template('base.php', array(
+		"title" => "Your followed feeds",
+		"message" => $message,
+		"content" => new Template('feeds.php', array(
+			"feeds" => meintopf_get_feeds())
+		)
+	));
+	$out->render();
 }
 
 // Get all items
