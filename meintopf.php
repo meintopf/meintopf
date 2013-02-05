@@ -341,6 +341,12 @@ function meintopf_get_feeds() {
 
 // Add a feed to the list
 function meintopf_add_feed($feed_url) {
+	// Get mEintopf options
+	$options = get_option("meintopf_options");
+	// Check if feed is already subscribed to.
+	if (in_array($feed_url, $options['feeds'])) {
+		return false;
+	}
 	// Initialize a simplepie object with the given url
 	$feed = fetch_feed($feed_url);
 	// Not a valid feed?
@@ -348,7 +354,10 @@ function meintopf_add_feed($feed_url) {
 		// Failure.
 		return false;
 	} else { // Feed is valid
-		$options = get_option("meintopf_options");
+		// Check again if feed is already subscribed to.
+		if (in_array($feed->subscribe_url(), $options['feeds'])) {
+			return false;
+		}
 		// Add subscribe url to feed list (instead of given url to avoid autodiscovery)
 		$options['feeds'][] = $feed->subscribe_url(); 
 		update_option('meintopf_options',$options);
