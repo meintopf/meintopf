@@ -148,27 +148,52 @@ function meintopf_page_reader() {
 
 // Show the feed management page
 function meintopf_page_feeds() {
-	
 	$message = "";
 	
+	// Add a feed, if asked to do so
+	if( isset($_POST['action']) && isset($_POST['feedurl']) ) {
+		if ($_POST['action'] == "add") {
+			//trying to add a new feed.
+			$success = meintopf_add_feed($_POST['feedurl']);
+			if ($success) {
+				$message = "Feed added.";
+			} else {
+				$message = "Could not add feed.";
+			}
+		} 
+	}
 	
-	if( isset($_POST['feedurl']) ) {
-		//trying to add a new feed.
-		$success = meintopf_add_feed($_POST['feedurl']);
-		if ($success) {
-			$message = "Feed added.";
-		} else {
-			$message = "Could not add feed.";
+	// Remove a feed if asked to do so.
+	if (isset($_GET['action']) && isset($_GET['feedurl']) ) {
+		if ($_GET['action'] == "remove") {
+			//trying to remove a feed.
+			$feed_url = rawurldecode($_GET['feedurl']);
+			$success = meintopf_remove_feed($feed_url);
+			if ($success) {
+				$message = "Feed removed.";
+			} else {
+				$message = "Could not remove feed.";
+			}
 		}
 	}
-		
+	
+	$feeds = meintopf_get_feeds();
+	$feeds_template = array();
+	foreach ($feeds as $feed) {
+		$feeds_template[] = array(
+			"text" => htmlentities($feed),
+			"removal_link" => add_query_arg( array( "action" => "remove",
+				"feedurl" => htmlentities(rawurlencode($feed))))
+			);
+	}
+	
 	// create and render template
 	$out = new Template('base.php', array(
 		"title" => "Your followed feeds",
 		"message" => $message,
 		"content" => new Template('feeds.php', array(
-			"feeds" => meintopf_get_feeds())
-		)
+			"feeds" => $feeds_template
+			))
 	));
 	$out->render();
 }
@@ -368,5 +393,21 @@ function meintopf_add_feed($feed_url) {
 		// Success.
 		return true;
 	}
+}
+
+// Remove a feed from the list
+function meintopf_remove_feed($feed_url) {
+	// Get mEintopf options
+	$options = get_option("meintopf_options");
+	// Check if feed is subscribed to.
+	if (!in_array($feed_url, $options['feeds'])) {
+		return false;
+	}
+	// Search and remove item.
+	$index = array_search($feed_url, $options['feeds']);
+	unset($options['feeds'][$index]);
+	// Store updated feed list
+	update_option('meintopf_options',$options);
+	return true;
 }
 ?>
