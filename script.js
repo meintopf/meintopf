@@ -46,4 +46,5 @@ jQuery(window).ready(function() {
 	var source   = jQuery("#meintopf_reader_item_template").html();
 	meintopf_item_template = Handlebars.compile(source);
 	meintopf_next_posts(1);
+	postboxes.add_postbox_toggles(pagenow);
 });

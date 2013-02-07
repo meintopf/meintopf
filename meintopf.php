@@ -105,6 +105,8 @@ function meintopf_scripts() {
 function meintopf_admin_scripts() {
 	wp_enqueue_script( 'handlebars' );
 	wp_enqueue_script( 'meintopf_admin_js' );
+	/* Enqueue WordPress' script for handling the meta boxes */
+	wp_enqueue_script('postbox');
 }
 
 // Show the admin menu page
