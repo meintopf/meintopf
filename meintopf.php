@@ -125,6 +125,7 @@ function meintopf_page_reader() {
 			$message = "Error getting feeds";
 		}
 		$out = new Template('base.php', array(
+			"title" => "Manual Feed Update",
 			"message" => $message,
 			"content" => ""
 		));
