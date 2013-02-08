@@ -1,0 +1,41 @@
+.meintopf_reader_item {
+	max-width: 520px;
+	padding: 5px;
+	margin: 5px;
+	border-bottom: 1px solid #999;
+	margin: 0 auto;
+}
+
+.meintopf_reader_item h1 {
+	font-size: 1.5em;
+	line-height: 1.1em;
+	font-weight: bold;
+}
+
+.meintopf_reader_item blockquote {
+	border-left: 3px solid #ddd;
+	padding: 1px 0 1px 10px; 
+}
+
+.meintopf_reader_item .repost_link_wrapper {
+	text-align: right;
+	margin-bottom: 4px;
+}
+
+.meintopf_reader_item .repost_link {
+	background: #eee;
+	padding: 4px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.meintopf_reader_item .repost_link img {
+	height: 10px;
+	width: 10px;
+}
+
+.postbox .button-primary {
+	position: relative;
+	margin-top: 5px;
+	left: 175px;
+}

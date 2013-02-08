@@ -108,6 +108,8 @@ function meintopf_admin_scripts() {
 	wp_enqueue_script( 'meintopf_admin_js' );
 	/* Enqueue WordPress' script for handling the meta boxes */
 	wp_enqueue_script('postbox');
+	
+	wp_enqueue_style( 'meintopf_admin_css' );
 }
 
 // Show the admin menu page
@@ -202,7 +204,7 @@ function meintopf_page_feeds() {
 }
 
 // Get all items
-function meintopf_reader_get_posts($page_no, $posts_per_page = 20) {
+function meintopf_reader_get_posts($page_no, $posts_per_page = 10) {
 	$args = array(
     'posts_per_page'  => $posts_per_page,
     'paged'           => $page_no,

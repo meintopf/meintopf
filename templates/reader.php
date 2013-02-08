@@ -6,17 +6,18 @@
 				<script id="meintopf_reader_item_template" type="text/x-handlebars-template">
 					<div class="meintopf_reader_item" id="item_{{id}}">
 						{{#if title}}
-							<h3>{{title}}</h3>
+							<h1>{{title}}</h1>
 						{{/if}}
 						
 						<div class="meintopf_reader_content">{{{content}}}</div>
-						<div class="repost_link">
+						<div class="repost_link_wrapper"><span class="repost_link">
 							{{#unless reposted }}
 								<a href="#" onclick="meintopf_repost({{id}});return false;">Repost</a>
 							{{/unless}}
 							{{#if reposted}}
 								Already reposted.
 							{{/if}}
+						</span>
 						</div>
 					</div>
 				</script>
@@ -32,7 +33,7 @@
 						<ul>
 							<li>
 								<label for="feedurl">Feed-URL</label><br>
-								<input type="text" maxlength="255" size="30" name="feedurl" id="feedurl">
+								<input type="text" maxlength="255" size="29" name="feedurl" id="feedurl">
 								<input type="submit" class="button button-primary button-large" value="Add Feed">
 							</li>
 						</ul>
