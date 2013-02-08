@@ -240,14 +240,16 @@ function meintopf_ajax_repost() {
 			'post_content' => $post->post_content,
 			'post_status' => "publish",
 			'comment_status' => "closed",
-			'ping_status' => "open",
-			'to_ping' => $meta["permalink"]
+			'ping_status' => "open"
 		);
 		// insert it
 		$success = wp_insert_post($repost);
 		if ($success <> 0) {
 			// Append metadata for repost
 			update_post_meta($success, 'meintopf_item_metadata', $meta);
+			
+			// Send pingback
+			pingback(meintopf_filter_content_append($post->post_content,$success), $success);
 			
 			// Set meintopf item status to publish, as in "has been reposted"
 			$post->post_status = "publish";
@@ -341,9 +343,12 @@ function meintopf_adjust_kses_tags($allowedtags) {
 
 // FILTER: Append "Reposted from" to any post with the given set of metadata.
 // Exact content of the append is pulled from template
-function meintopf_filter_content_append( $content ) {
+function meintopf_filter_content_append( $content, $id = -1 ) {
+	if ($id == -1) {
+		$id = get_the_ID();
+	}
 	// get the metadata
-	$meta = get_post_meta(get_the_ID() , 'meintopf_item_metadata', true);
+	$meta = get_post_meta( $id , 'meintopf_item_metadata', true);
 	// Got something?
 	if ($meta != "") {
 		// Create instance of template with given values.
