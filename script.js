@@ -5,7 +5,8 @@ function meintopf_repost(id) {
 		action: 'meintopf_repost',
 		post_id: id
 	};
-	
+	var gif_src = jQuery("#meintopf_repost_gif").attr("src");
+	jQuery("#item_"+id+" .repost_link").html("<img src=\""+gif_src+"\"> Reposting...");
 	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
 	jQuery.post(ajaxurl, data, function(response) {
 		var html = meintopf_render_item(response);

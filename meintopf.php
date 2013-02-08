@@ -78,6 +78,7 @@ function meintopf_init() {
 	
 	// Register CSS
 	wp_register_style( 'meintopf_css', plugins_url('style.css', __FILE__) );
+	wp_register_style( 'meintopf_admin_css', plugins_url('admin.css', __FILE__) );
 	
 	/* Custom actions */
 	// Create admin menu entry

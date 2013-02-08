@@ -10,12 +10,14 @@
 						{{/if}}
 						
 						<div class="meintopf_reader_content">{{{content}}}</div>
-						{{#unless reposted }}
-							<a href="#" onclick="meintopf_repost({{id}});return false;">Repost</a>
-						{{/unless}}
-						{{#if reposted}}
-							Already reposted.
-						{{/if}}
+						<div class="repost_link">
+							{{#unless reposted }}
+								<a href="#" onclick="meintopf_repost({{id}});return false;">Repost</a>
+							{{/unless}}
+							{{#if reposted}}
+								Already reposted.
+							{{/if}}
+						</div>
 					</div>
 				</script>
 				<div id="loader"><a id="load_next" href="#">Load next posts</a></div>
@@ -41,4 +43,4 @@
 		
 	</div>
 </div>
-
+<img src="<?= plugins_url( 'images/reposting.gif' , dirname(__FILE__) );?>" style="display:none;" id="meintopf_repost_gif">
