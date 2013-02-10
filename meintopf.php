@@ -355,8 +355,10 @@ function meintopf_filter_content_append( $content, $id = -1 ) {
 	$meta = get_post_meta( $id , 'meintopf_item_metadata', true);
 	// Got something?
 	if ($meta != "") {
+		$baseurl = parse_url($meta["permalink"]);
 		// Create instance of template with given values.
 		$out = new Template('repost.php', array(
+			"baseurl" => $baseurl["scheme"].'://'.$baseurl["host"],
 			"permalink" => $meta["permalink"],
 			"title" => $meta["feed_title"]
 		));
