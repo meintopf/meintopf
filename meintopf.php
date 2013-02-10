@@ -22,11 +22,15 @@ register_deactivation_hook(__FILE__, 'meintopf_deactivate');
 add_action( 'init', 'meintopf_init' );
 add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
 add_action( 'wp_enqueue_scripts', 'meintopf_scripts' );
-add_action( 'wp_before_admin_bar_render', 'meintopf_adminbar' ); 
+add_action( 'wp_before_admin_bar_render', 'meintopf_adminbar' );
+add_action( 'widgets_init', 'meintopf_widget_registration' ); 
 
 // Filters to do things to other things
 add_filter( 'the_content', 'meintopf_filter_content_append' );
 add_filter( 'comments_array', 'meintopf_filter_comments', 20, 2 );
+
+// Include classes
+include_once(dirname( __FILE__ ).'/widgets.class.php');
 
 // Activate the plugin
 function meintopf_activate() {
@@ -454,40 +458,7 @@ function meintopf_adminbar() {
 	));
 }
 
-class meintopf_following_widget extends WP_Widget {
-	function meintopf_following_widget() {
-		$widget_ops = array('classname' => 'meintopf_following_widget', 'description' => 'A list of your following feeds.' );
-		$this->WP_Widget('meintopf_following_widget', 'Following', $widget_ops);
-	}
-	function widget($args, $instance) {
-		extract($args, EXTR_SKIP);
-		echo $before_widget;
-		$title = empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
-		if ( !empty( $title ) ) { echo $before_title . $title . $after_title; };
-		$feeds = meintopf_get_feeds();
-		foreach ($feeds as $feed) {
-			$baseurl = parse_url($feed);
-			echo '<a href="'.$baseurl["scheme"].'://'.$baseurl["host"].'"><img src="http://g.etfv.co/'.$feed.'"></a>';
-		}
-		echo $after_widget;
-	}
-	function update($new_instance, $old_instance) {
-		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		return $instance;
-	}
-	function form($instance) {
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'entry_title' => '', 'comments_title' => '' ) );
-		$title = strip_tags($instance['title']);
-		$entry_title = strip_tags($instance['entry_title']);
-		$comments_title = strip_tags($instance['comments_title']);
-?>
-			<p><label for="<?php echo $this->get_field_id('title'); ?>">Title: <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" /></label></p>
-<?php
-	}
-}
-add_action('widgets_init', 'register_following_widget');
-function register_following_widget(){
+function meintopf_widget_registration(){
 	register_widget('meintopf_following_widget');
 }
 // Filter pingbacks out
