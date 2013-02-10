@@ -15,7 +15,7 @@ include_once(ABSPATH . WPINC . '/feed.php');
 include_once(dirname( __FILE__ ).'/Template.class.php');
 
 // Include other classes
-include_once(dirname( __FILE__ ).'/widgets.class.php');
+include_once(dirname( __FILE__ ).'/Meintopf_Following_Widget.class.php');
 
 // Plugin activation & deactivation hooks
 register_activation_hook( __FILE__, 'meintopf_activate' );
@@ -470,7 +470,7 @@ function meintopf_filter_comments($comments, $post_id) {
 }
 
 function meintopf_widget_registration(){
-	register_widget('meintopf_following_widget');
+	register_widget('Meintopf_Following_Widget');
 }
 ?>
 
