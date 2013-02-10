@@ -142,11 +142,7 @@ function meintopf_page_reader() {
 			if ($success) {
 				$message = "Feed added.";
 			} else {
-<<<<<<< Updated upstream
 				$message = "Could not add feed.";
-=======
-				$message = "aCould not add feed.";
->>>>>>> Stashed changes
 			}
 		}
 		
