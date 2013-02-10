@@ -395,18 +395,25 @@ function meintopf_filter_content_append( $content, $id = -1 ) {
  * ******************/
 // Get list of feeds we are subscribed to
 function meintopf_get_feeds() {
-	$options = get_option("meintopf_options");
-	$feeds = array();
-	foreach ($options["feeds"] as $feed_url) {
-		$feed = fetch_feed($feed_url);
-		// Feed is valid
-		if (!is_wp_error( $feed )) {
-			$feeds[] = array(
-				"feed_url" => $feed_url,
-				"title" => $feed->get_title(),
-				"link" => $feed->get_link()
-			);
-		}				
+	// try to get feeds from cache
+	$feeds = wp_cache_get('feeds', 'meintopf');
+	// if cache is empty, gather information
+	if ($feeds === false) {
+		$options = get_option("meintopf_options");
+		$feeds = array();
+		foreach ($options["feeds"] as $feed_url) {
+			$feed = fetch_feed($feed_url);
+			// Feed is valid
+			if (!is_wp_error( $feed )) {
+				$feeds[] = array(
+					"feed_url" => $feed_url,
+					"title" => $feed->get_title(),
+					"link" => $feed->get_link()
+				);
+			}				
+		}
+		// store in cache for 24h
+		wp_cache_set('feeds', $feeds, 'meintopf', 86400);
 	}
 	return $feeds;
 }
@@ -433,6 +440,8 @@ function meintopf_add_feed($feed_url) {
 		// Add subscribe url to feed list (instead of given url to avoid autodiscovery)
 		$options['feeds'][] = $feed->subscribe_url(); 
 		update_option('meintopf_options',$options);
+		// Clear cached feeds
+		wp_cache_delete("feeds", "meintopf");
 		// Schedule feed fetching.
 		wp_schedule_single_event(time(), 'meintopf_fetch_feeds');
 		// spawn crown now.
