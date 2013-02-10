@@ -4,7 +4,7 @@ class Meintopf_Following_Widget extends WP_Widget {
 	
 	function __construct() {
 		$widget_ops = array('classname' => 'Meintopf_Following_Widget', 'description' => 'A list of your following feeds.' );
-		$this->WP_Widget('Meintopf_Following_Widget', 'Following', $widget_ops);
+		parent::__construct('Meintopf_Following_Widget', 'Following', $widget_ops);
 	}
 
 	// Website widget
@@ -37,3 +37,4 @@ class Meintopf_Following_Widget extends WP_Widget {
 <?php
 	}
 }
+

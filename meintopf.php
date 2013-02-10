@@ -32,7 +32,6 @@ add_action( 'widgets_init', 'meintopf_widget_registration' );
 add_filter( 'the_content', 'meintopf_filter_content_append' );
 add_filter( 'comments_array', 'meintopf_filter_comments', 20, 2 );
 
-
 // Activate the plugin
 function meintopf_activate() {
 	// Version check
@@ -289,7 +288,8 @@ function meintopf_reader_fetch_feeds() {
 	add_filter( 'wp_kses_allowed_html', 'meintopf_adjust_kses_tags');
 	
 	// get the list of feeds
-	$feeds = get_option("meintopf_options")["feeds"];
+	$options = get_option("meintopf_options");
+	$feeds = $options["feeds"];
 	
 	// Make sure it's not empty.
 	if (count($feeds) > 0) {
@@ -491,5 +491,3 @@ function meintopf_filter_comments($comments, $post_id) {
 function meintopf_widget_registration(){
 	register_widget('Meintopf_Following_Widget');
 }
-?>
-
