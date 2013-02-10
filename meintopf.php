@@ -22,7 +22,7 @@ register_deactivation_hook(__FILE__, 'meintopf_deactivate');
 add_action( 'init', 'meintopf_init' );
 add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
 add_action( 'wp_enqueue_scripts', 'meintopf_scripts' );
-add_action( 'wp_before_admin_bar_render', 'add_adminbar_link' ); 
+add_action( 'wp_before_admin_bar_render', 'meintopf_adminbar' ); 
 
 // Filters to do things to other things
 add_filter( 'the_content', 'meintopf_filter_content_append' );
@@ -424,9 +424,10 @@ function meintopf_remove_feed($feed_url) {
 	return true;
 }
 
-function add_adminbar_link() {
+// Add mEintopf Feed-Link to Adminbar
+function meintopf_adminbar() {
 	global $wp_admin_bar;
-        // Add mEintopf Feed-Link to Adminbar
+        
 	$wp_admin_bar->add_menu( array(
 		'id'    => 'mEintopf',
 		'title' => 'mEintopf Stream',
