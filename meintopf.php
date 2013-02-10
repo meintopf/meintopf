@@ -197,12 +197,10 @@ function meintopf_page_feeds() {
 	
 	$feeds = meintopf_get_feeds();
 	$feeds_template = array();
-	foreach ($feeds as $feed) {
-		$feeds_template[] = array(
-			"text" => htmlentities($feed),
-			"removal_link" => add_query_arg( array( "action" => "remove",
-				"feedurl" => htmlentities(rawurlencode($feed))))
-			);
+	foreach ($feeds as &$feed) {
+		$feed["text"] = htmlentities($feed["feed_url"]);
+		$feed["removal_link"] = add_query_arg( array( "action" => "remove",
+				"feedurl" => htmlentities(rawurlencode($feed["feed_url"]))));
 	}
 	
 	// create and render template
@@ -210,7 +208,7 @@ function meintopf_page_feeds() {
 		"title" => "Your followed feeds",
 		"message" => $message,
 		"content" => new Template('feeds.php', array(
-			"feeds" => $feeds_template
+			"feeds" => $feeds
 			))
 	));
 	$out->render();
@@ -291,7 +289,7 @@ function meintopf_reader_fetch_feeds() {
 	add_filter( 'wp_kses_allowed_html', 'meintopf_adjust_kses_tags');
 	
 	// get the list of feeds
-	$feeds = meintopf_get_feeds();
+	$feeds = get_option("meintopf_options")["feeds"];
 	
 	// Make sure it's not empty.
 	if (count($feeds) > 0) {
@@ -398,7 +396,19 @@ function meintopf_filter_content_append( $content, $id = -1 ) {
 // Get list of feeds we are subscribed to
 function meintopf_get_feeds() {
 	$options = get_option("meintopf_options");
-	return $options["feeds"];
+	$feeds = array();
+	foreach ($options["feeds"] as $feed_url) {
+		$feed = fetch_feed($feed_url);
+		// Feed is valid
+		if (!is_wp_error( $feed )) {
+			$feeds[] = array(
+				"feed_url" => $feed_url,
+				"title" => $feed->get_title(),
+				"link" => $feed->get_link()
+			);
+		}				
+	}
+	return $feeds;
 }
 
 // Add a feed to the list
