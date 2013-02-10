@@ -14,6 +14,9 @@ include_once(ABSPATH . WPINC . '/feed.php');
 // Simple templating system
 include_once(dirname( __FILE__ ).'/Template.class.php');
 
+// Include other classes
+include_once(dirname( __FILE__ ).'/Meintopf_Following_Widget.class.php');
+
 // Plugin activation & deactivation hooks
 register_activation_hook( __FILE__, 'meintopf_activate' );
 register_deactivation_hook(__FILE__, 'meintopf_deactivate');
@@ -29,8 +32,6 @@ add_action( 'widgets_init', 'meintopf_widget_registration' );
 add_filter( 'the_content', 'meintopf_filter_content_append' );
 add_filter( 'comments_array', 'meintopf_filter_comments', 20, 2 );
 
-// Include classes
-include_once(dirname( __FILE__ ).'/widgets.class.php');
 
 // Activate the plugin
 function meintopf_activate() {
@@ -196,12 +197,10 @@ function meintopf_page_feeds() {
 	
 	$feeds = meintopf_get_feeds();
 	$feeds_template = array();
-	foreach ($feeds as $feed) {
-		$feeds_template[] = array(
-			"text" => htmlentities($feed),
-			"removal_link" => add_query_arg( array( "action" => "remove",
-				"feedurl" => htmlentities(rawurlencode($feed))))
-			);
+	foreach ($feeds as &$feed) {
+		$feed["text"] = htmlentities($feed["feed_url"]);
+		$feed["removal_link"] = add_query_arg( array( "action" => "remove",
+				"feedurl" => htmlentities(rawurlencode($feed["feed_url"]))));
 	}
 	
 	// create and render template
@@ -209,7 +208,7 @@ function meintopf_page_feeds() {
 		"title" => "Your followed feeds",
 		"message" => $message,
 		"content" => new Template('feeds.php', array(
-			"feeds" => $feeds_template
+			"feeds" => $feeds
 			))
 	));
 	$out->render();
@@ -290,7 +289,7 @@ function meintopf_reader_fetch_feeds() {
 	add_filter( 'wp_kses_allowed_html', 'meintopf_adjust_kses_tags');
 	
 	// get the list of feeds
-	$feeds = meintopf_get_feeds();
+	$feeds = get_option("meintopf_options")["feeds"];
 	
 	// Make sure it's not empty.
 	if (count($feeds) > 0) {
@@ -397,7 +396,19 @@ function meintopf_filter_content_append( $content, $id = -1 ) {
 // Get list of feeds we are subscribed to
 function meintopf_get_feeds() {
 	$options = get_option("meintopf_options");
-	return $options["feeds"];
+	$feeds = array();
+	foreach ($options["feeds"] as $feed_url) {
+		$feed = fetch_feed($feed_url);
+		// Feed is valid
+		if (!is_wp_error( $feed )) {
+			$feeds[] = array(
+				"feed_url" => $feed_url,
+				"title" => $feed->get_title(),
+				"link" => $feed->get_link()
+			);
+		}				
+	}
+	return $feeds;
 }
 
 // Add a feed to the list
@@ -458,9 +469,6 @@ function meintopf_adminbar() {
 	));
 }
 
-function meintopf_widget_registration(){
-	register_widget('meintopf_following_widget');
-}
 // Filter pingbacks out
 function meintopf_filter_comments($comments, $post_id) {
 	foreach ($comments as $key => $comment) {
@@ -471,5 +479,8 @@ function meintopf_filter_comments($comments, $post_id) {
 	return $comments;
 }
 
+function meintopf_widget_registration(){
+	register_widget('Meintopf_Following_Widget');
+}
 ?>
 

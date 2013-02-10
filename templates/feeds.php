@@ -6,11 +6,14 @@
 	<h3>Feeds you follow</h3>
 	<table class="wp-list-table widefat fixed">
 		<thead>
-			<tr><th width="50">Avatar</th><th>Feed URL</th><th>Actions</th></tr>
+			<tr><th width="50">Avatar</th><th>Title</th><th>Feed URL</th><th width="100">Actions</th></tr>
 		</thead>
+		<tfoot>
+			<tr><th width="50">Avatar</th><th>Title</th><th>Feed URL</th><th width="100">Actions</th></tr>
+		</tfoot>
 		<tbody>
 			<?php foreach ($this->feeds as $feed) { ?>
-				<tr><td><img src="http://g.etfv.co/<?= $feed["text"]; ?>"></td><td><?= $feed["text"]; ?></td><td><a href="<?= $feed["removal_link"]; ?>">Unfollow</a></td></tr>
+				<tr><td><img src="http://g.etfv.co/<?= $feed["link"]; ?>"></td><td><a href="<?= $feed["link"]; ?>"><?= $feed["title"]; ?></a></td><td><?= $feed["text"]; ?></td><td><a href="<?= $feed["removal_link"]; ?>">Unfollow</a></td></tr>
 			<?php } ?>
 		</tbody>
 	</table>

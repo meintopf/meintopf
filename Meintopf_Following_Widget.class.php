@@ -1,9 +1,10 @@
 <?php
 // Add following widget
-class meintopf_following_widget extends WP_Widget {
-	function meintopf_following_widget() {
-		$widget_ops = array('classname' => 'meintopf_following_widget', 'description' => 'A list of your following feeds.' );
-		$this->WP_Widget('meintopf_following_widget', 'Following', $widget_ops);
+class Meintopf_Following_Widget extends WP_Widget {
+	
+	function __construct() {
+		$widget_ops = array('classname' => 'Meintopf_Following_Widget', 'description' => 'A list of your following feeds.' );
+		$this->WP_Widget('Meintopf_Following_Widget', 'Following', $widget_ops);
 	}
 
 	// Website widget
@@ -13,7 +14,7 @@ class meintopf_following_widget extends WP_Widget {
 		$title = empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
 		if ( !empty( $title ) ) { echo $before_title . $title . $after_title; };
 		$feeds = meintopf_get_feeds();
-		$out = new Template('widget.php', array(
+		$out = new Template('following_widget.php', array(
 			"feeds" => $feeds
 		));
 		$out->render();
