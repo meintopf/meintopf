@@ -26,6 +26,7 @@ add_action( 'wp_before_admin_bar_render', 'meintopf_adminbar' );
 
 // Filters to do things to other things
 add_filter( 'the_content', 'meintopf_filter_content_append' );
+add_filter( 'comments_array', 'meintopf_filter_comments', 20, 2 );
 
 // Activate the plugin
 function meintopf_activate() {
@@ -368,8 +369,21 @@ function meintopf_filter_content_append( $content, $id = -1 ) {
 			"title" => $meta["feed_title"]
 		));
 		// Render the template out to a string and append it to the content.
-		$content = $content . $out->rendertoString();;
+		$content = $content . $out->rendertoString();
 	}
+	
+	// get pingbacks
+	$args = array( "type" => "pingback", "post_id" => $id);
+	$pingbacks = get_comments($args);
+	if (count($pingbacks) > 0) {
+		// Create instance of template with given values.
+		$out = new Template('reposts.php', array(
+			"pingbacks" => $pingbacks
+		));
+		// Render the template out to a string and append it to the content.
+		$content = $content . $out->rendertoString();
+	}
+	
 	return $content;
 }
 
@@ -439,4 +453,16 @@ function meintopf_adminbar() {
 		'href'  => admin_url("admin.php?page=meintopf")
 	));
 }
+
+// Filter pingbacks out
+function meintopf_filter_comments($comments, $post_id) {
+	foreach ($comments as $key => $comment) {
+		if ($comment->comment_type == "pingback") {
+			unset($comments[$key]);
+		}
+	}
+	return $comments;
+}
+
 ?>
+
