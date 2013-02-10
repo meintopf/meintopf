@@ -132,13 +132,18 @@ function meintopf_page_reader() {
 		));
 		$out->render();
 	} else {
-		if( isset($_POST['feedurl']) ) {
+		if( isset($_REQUEST['feedurl']) ) {
 			//trying to add a new feed.
-			$success = meintopf_add_feed($_POST['feedurl']);
+			if (isset($_GET['feedurl'])) {
+				$feedurl = rawurldecode($_GET['feedurl']);
+			} else {
+				$feedurl = $_POST["feedurl"];
+			}
+			$success = meintopf_add_feed($feedurl);
 			if ($success) {
 				$message = "Feed added.";
 			} else {
-				$message = "Could not add feed.";
+				$message = "Could not add feed " . $feedurl;
 			}
 		}
 		
