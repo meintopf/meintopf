@@ -15,6 +15,7 @@ function meintopf_repost(id) {
 };
 
 function meintopf_next_posts(page_no) {
+	jQuery("#meintopf_feed #loader #load_next").off();
 	var data = {
 		action: 'meintopf_next_posts',
 		page_no: page_no
@@ -43,9 +44,16 @@ function meintopf_render_item(post) {
 	}
 	return meintopf_item_template(context);
 }
+
 jQuery(window).ready(function() {
 	var source   = jQuery("#meintopf_reader_item_template").html();
 	meintopf_item_template = Handlebars.compile(source);
 	meintopf_next_posts(1);
 	postboxes.add_postbox_toggles(pagenow);
+	
+	jQuery(window).scroll(function() {
+		if (document.documentElement.clientHeight + jQuery(document).scrollTop() >= jQuery("#wpwrap").height() - 120) { 
+			jQuery("#meintopf_feed #loader #load_next").click()
+    }
+	});
 });
