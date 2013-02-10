@@ -14,6 +14,9 @@ include_once(ABSPATH . WPINC . '/feed.php');
 // Simple templating system
 include_once(dirname( __FILE__ ).'/Template.class.php');
 
+// Include other classes
+include_once(dirname( __FILE__ ).'/widgets.class.php');
+
 // Plugin activation & deactivation hooks
 register_activation_hook( __FILE__, 'meintopf_activate' );
 register_deactivation_hook(__FILE__, 'meintopf_deactivate');
@@ -22,11 +25,13 @@ register_deactivation_hook(__FILE__, 'meintopf_deactivate');
 add_action( 'init', 'meintopf_init' );
 add_action( 'meintopf_fetch_feeds', 'meintopf_reader_fetch_feeds');
 add_action( 'wp_enqueue_scripts', 'meintopf_scripts' );
-add_action( 'wp_before_admin_bar_render', 'meintopf_adminbar' ); 
+add_action( 'wp_before_admin_bar_render', 'meintopf_adminbar' );
+add_action( 'widgets_init', 'meintopf_widget_registration' ); 
 
 // Filters to do things to other things
 add_filter( 'the_content', 'meintopf_filter_content_append' );
 add_filter( 'comments_array', 'meintopf_filter_comments', 20, 2 );
+
 
 // Activate the plugin
 function meintopf_activate() {
@@ -464,5 +469,8 @@ function meintopf_filter_comments($comments, $post_id) {
 	return $comments;
 }
 
+function meintopf_widget_registration(){
+	register_widget('meintopf_following_widget');
+}
 ?>
 
