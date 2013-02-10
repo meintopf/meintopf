@@ -1,10 +1,12 @@
 <?php
-
+// Add following widget
 class meintopf_following_widget extends WP_Widget {
 	function meintopf_following_widget() {
 		$widget_ops = array('classname' => 'meintopf_following_widget', 'description' => 'A list of your following feeds.' );
 		$this->WP_Widget('meintopf_following_widget', 'Following', $widget_ops);
 	}
+
+	// Website widget
 	function widget($args, $instance) {
 		extract($args, EXTR_SKIP);
 		echo $before_widget;
@@ -17,11 +19,15 @@ class meintopf_following_widget extends WP_Widget {
 		$out->render();
 		echo $after_widget;
 	}
+
+	// What happens on update
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
 		return $instance;
 	}
+
+	// Form in the admin panel
 	function form($instance) {
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'entry_title' => '', 'comments_title' => '' ) );
 		$title = strip_tags($instance['title']);
