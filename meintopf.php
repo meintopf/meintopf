@@ -68,12 +68,28 @@ function meintopf_activate() {
 	
 	// schedule feed fetcher
 	wp_schedule_event( time(), 'hourly', 'meintopf_fetch_feeds');
+	
+	// update/check existing data
+	meintopf_data_update();
 }
 
 // deactivate plugin
 function meintopf_deactivate() {
 	// Remove feed fetcher from schedule
 	wp_clear_scheduled_hook('meintopf_fetch_feeds');
+}
+
+// Check data consistency on activation
+function meintopf_data_update() {
+	$posts = meintopf_reader_get_posts(0,-1);
+	$feeds = meintopf_get_feeds();
+	foreach ($posts as $post) {
+		// item metadata "feed_link" added in commit 0b13bc0c3818d8781e265d158ee2250fda5175b7, update previous posts
+		if (!array_key_exists("feed_link",$post->meta)) {
+			$post->meta["feed_link"] = $feeds[$post->meta["feed_url"]]["link"];
+			update_post_meta($post->ID, 'meintopf_item_metadata', $post->meta);
+		}
+	}
 }
 
 // Init the plugin each time
@@ -409,7 +425,7 @@ function meintopf_get_feeds() {
 			$feed = fetch_feed($feed_url);
 			// Feed is valid
 			if (!is_wp_error( $feed )) {
-				$feeds[] = array(
+				$feeds[$feed_url] = array(
 					"feed_url" => $feed_url,
 					"title" => $feed->get_title(),
 					"link" => $feed->get_link()
