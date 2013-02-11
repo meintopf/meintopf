@@ -40,7 +40,11 @@ function meintopf_render_item(post) {
 		title: post["post_title"],
 		content: post["post_content"],
 		reposted: (post["post_status"]=="publish"),
-		id: post["ID"]
+		id: post["ID"],
+		feed_title: post["meta"]["feed_title"],
+		feed_link: post["meta"]["feed_link"],
+		link: post["meta"]["permalink"],
+		date: post["post_date"]
 	}
 	return meintopf_item_template(context);
 }

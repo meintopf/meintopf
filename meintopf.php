@@ -222,7 +222,10 @@ function meintopf_reader_get_posts($page_no, $posts_per_page = 10) {
     'post_type'       => 'meintopf_item',
     'post_status'     => 'any',
     'suppress_filters' => true );
-	$posts = get_posts( $args );
+	$posts = get_posts($args, ARRAY_A);
+	foreach ($posts as &$post) {
+		$post->meta = get_post_meta($post->ID, 'meintopf_item_metadata', true);
+	}
 	return $posts;
 }
 
@@ -330,7 +333,8 @@ function meintopf_reader_fetch_feeds() {
 						'permalink' => $item->get_permalink(),
 						'author' => $author,
 						'feed_url' => $item->get_feed()->subscribe_url(),
-						'feed_title' => $item->get_feed()->get_title()
+						'feed_title' => $item->get_feed()->get_title(),
+						'feed_link' => $item->get_feed()->get_link()
 					);
 					update_post_meta($id, 'meintopf_item_metadata', $meta);
 				}

@@ -6,18 +6,22 @@
 				<script id="meintopf_reader_item_template" type="text/x-handlebars-template">
 					<div class="meintopf_reader_item" id="item_{{id}}">
 						{{#if title}}
-							<h1>{{title}}</h1>
+							<h1><a href="{{link}}">{{title}}</a></h1>
 						{{/if}}
-						
 						<div class="meintopf_reader_content">{{{content}}}</div>
-						<div class="repost_link_wrapper"><span class="repost_link">
-							{{#unless reposted }}
-								<a href="#" onclick="meintopf_repost({{id}});return false;">Repost</a>
-							{{/unless}}
-							{{#if reposted}}
-								Already reposted.
-							{{/if}}
-						</span>
+						<div class="item_footer">
+							<span class="meta">
+								<img src="http://g.etfv.co/{{feed_link}}" width="16" height="16">&nbsp;<a href="{{feed_link}}">{{feed_title}}</a>, {{date}}
+							</span>
+							<span class="repost_link">
+								{{#unless reposted }}
+									<a href="#" onclick="meintopf_repost({{id}});return false;">Repost</a>
+								{{/unless}}
+								{{#if reposted}}
+									Already reposted.
+								{{/if}}
+							</span>
+							<div></div>
 						</div>
 					</div>
 				</script>

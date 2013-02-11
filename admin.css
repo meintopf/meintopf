@@ -12,17 +12,37 @@
 	font-weight: bold;
 }
 
+.meintopf_reader_item h1 a {
+	text-decoration: none;
+}
+
 .meintopf_reader_item blockquote {
 	border-left: 3px solid #ddd;
 	padding: 1px 0 1px 10px; 
 }
 
-.meintopf_reader_item .repost_link_wrapper {
-	text-align: right;
-	margin-bottom: 4px;
+.meintopf_reader_item .item_footer {
+	margin-bottom: 2px;
+}
+.meintopf_reader_item .item_footer div {
+	clear:both;
+}
+
+.meintopf_reader_item .meta {
+	font-size: 0.9em;
+	color: #999;
+	float: left;
+	padding: 4px;
+}
+
+.meintopf_reader_item .meta img {
+	vertical-align: middle;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
 }
 
 .meintopf_reader_item .repost_link {
+	float: right;
 	background: #eee;
 	padding: 4px;
 	-moz-border-radius: 3px;
