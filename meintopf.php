@@ -95,12 +95,12 @@ function meintopf_data_update() {
 // Init the plugin each time
 function meintopf_init() {
 	// Register JS
-	wp_register_script( 'meintopf_admin_js', plugins_url('script.js', __FILE__) );
-	wp_register_script( 'handlebars', plugins_url('handlebars.js', __FILE__) );
+	wp_register_script( 'meintopf_admin_js', plugins_url('js/script.js', __FILE__) );
+	wp_register_script( 'handlebars', plugins_url('js/handlebars.js', __FILE__) );
 	
 	// Register CSS
-	wp_register_style( 'meintopf_css', plugins_url('style.css', __FILE__) );
-	wp_register_style( 'meintopf_admin_css', plugins_url('admin.css', __FILE__) );
+	wp_register_style( 'meintopf_css', plugins_url('css/style.css', __FILE__) );
+	wp_register_style( 'meintopf_admin_css', plugins_url('css/admin.css', __FILE__) );
 	
 	/* Custom actions */
 	// Create admin menu entry
