@@ -312,52 +312,57 @@ function meintopf_reader_fetch_feeds() {
 	
 	// Make sure it's not empty.
 	if (count($feeds) > 0) {
-		// Fetch all feeds as one, using WP's wrapper.
-		$feed = fetch_feed($feeds);
 		
-		// We can haz feed items
-		if (!is_wp_error( $feed )) {
-			foreach($feed->get_items() as $item) {
-				// Check if we have that post already
-				$args = array(
-					'meta_key' => 'meintopf_guid',
-					'meta_value' => $item->get_id(false),
-					'post_type' => 'meintopf_item',
-					'post_status'     => 'any'
-				);
-				$my_query = null;
-				$my_query = new WP_Query($args);
-				if ( !$my_query->have_posts() ) { // No, we don't. Insert it.
-					// Create the post itself
-					$post = array(
-						'post_type' =>'meintopf_item',
-						'post_title' => htmlspecialchars_decode($item->get_title()),
-						'post_content' => $item->get_content(),
-						'post_date' => $item->get_date('Y-m-d H:i:s'),
-						'post_date_gmt' => $item->get_gmdate('Y-m-d H:i:s'),
-						'guid' => $item->get_id()
+		// Fetch each feed individually.
+		foreach ($feeds as $feed_url) {
+			
+			// Fetch feed, using WP's SimplePie wrapper.
+			$feed = fetch_feed($feed_url);
+			
+			// We can haz feed items
+			if (!is_wp_error( $feed )) {
+				foreach($feed->get_items() as $item) {
+					// Check if we have that post already
+					$args = array(
+						'meta_key' => 'meintopf_guid',
+						'meta_value' => $item->get_id(false),
+						'post_type' => 'meintopf_item',
+						'post_status'     => 'any'
 					);
-					$id = wp_insert_post($post); // Insert the post
-					
-					update_post_meta($id, 'meintopf_guid', $item->get_id(false));
-					
-					// more metadata
-					$author = $item->get_feed()->get_title();
-					if ($author_obj = $item->get_author())
-						$author = $author_obj->get_name();
-					$meta = array(
-						'permalink' => $item->get_permalink(),
-						'author' => $author,
-						'feed_url' => $item->get_feed()->subscribe_url(),
-						'feed_title' => $item->get_feed()->get_title(),
-						'feed_link' => $item->get_feed()->get_link()
-					);
-					update_post_meta($id, 'meintopf_item_metadata', $meta);
+					$my_query = null;
+					$my_query = new WP_Query($args);
+					if ( !$my_query->have_posts() ) { // No, we don't. Insert it.
+						// Create the post itself
+						$post = array(
+							'post_type' =>'meintopf_item',
+							'post_title' => htmlspecialchars_decode($item->get_title()),
+							'post_content' => $item->get_content(),
+							'post_date' => $item->get_date('Y-m-d H:i:s'),
+							'post_date_gmt' => $item->get_gmdate('Y-m-d H:i:s'),
+							'guid' => $item->get_id()
+						);
+						$id = wp_insert_post($post); // Insert the post
+						
+						update_post_meta($id, 'meintopf_guid', $item->get_id(false));
+						
+						// more metadata
+						$author = $item->get_feed()->get_title();
+						if ($author_obj = $item->get_author())
+							$author = $author_obj->get_name();
+						$meta = array(
+							'permalink' => $item->get_permalink(),
+							'author' => $author,
+							'feed_url' => $item->get_feed()->subscribe_url(),
+							'feed_title' => $item->get_feed()->get_title(),
+							'feed_link' => $item->get_feed()->get_link()
+						);
+						update_post_meta($id, 'meintopf_item_metadata', $meta);
+					}
+					wp_reset_query();
 				}
-				wp_reset_query();
+			} else {
+				// Do nothing for now, as it would interrupt other feeds.
 			}
-		} else {
-			return false;
 		}
 	} else {
 		return false;
