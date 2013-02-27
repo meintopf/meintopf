@@ -16,3 +16,6 @@ This is probably not suitable for production use quite yet. Things might change,
 ## Notes
 * Feeds are fetched once every hour. And when you add a feed.
 * There's a lot of stuff still missing. Feel free to contribute.
+
+## License
+mEintopf is licensed under the MIT license. See LICENSE for details.
