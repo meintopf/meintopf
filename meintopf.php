@@ -31,6 +31,7 @@ add_action( 'widgets_init', 'meintopf_widget_registration' );
 // Filters to do things to other things
 add_filter( 'the_content', 'meintopf_filter_content_append' );
 add_filter( 'comments_array', 'meintopf_filter_comments', 20, 2 );
+add_filter( 'cron_schedules', 'meintopf_cron_interval');
 
 // Activate the plugin
 function meintopf_activate() {
@@ -67,7 +68,7 @@ function meintopf_activate() {
 	}
 	
 	// schedule feed fetcher
-	wp_schedule_event( time(), 'hourly', 'meintopf_fetch_feeds');
+	wp_schedule_event( time(), '10_minutes', 'meintopf_fetch_feeds');
 	
 	// update/check existing data
 	meintopf_data_update();
@@ -515,4 +516,11 @@ function meintopf_filter_comments($comments, $post_id) {
 
 function meintopf_widget_registration(){
 	register_widget('Meintopf_Following_Widget');
+}
+
+// Add a new cron interval: 10 minutes
+// http://www.ontimedesign.net/tips-tricks/how-run-wordpress-wp_cron-every-10-minutes/
+function meintopf_cron_interval($interval) {
+	$interval['10_minutes'] = array('interval' => 10*60, 'display' => 'Once every 10 minutes');
+	return $interval;
 }
