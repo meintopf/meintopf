@@ -287,6 +287,8 @@ function meintopf_ajax_repost() {
 			// Set meintopf item status to publish, as in "has been reposted"
 			$post->post_status = "publish";
 			wp_update_post($post);
+			
+			$post->meta = $meta;
 			// Send meintopf item back as json.
 			wp_send_json($post);
 		} else {
