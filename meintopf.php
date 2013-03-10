@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: mEintopf
-Version: 0.2
+Version: 0.2.1
 Description: soup.io for the real world
 Author: Severin Schols
 Author URI: http://severin.schols.de/

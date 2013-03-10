@@ -4,7 +4,7 @@ Donate link: https://flattr.com/submit/auto?user_id=tiefpunkt&url=http://github.
 Tags: feed,rss,reader,soup,soupio
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: v0.2
+Stable tag: 0.2.1
 License: MIT
 License URI: https://github.com/meintopf/meintopf/blob/master/LICENSE
 
